@@ -78,7 +78,7 @@ app.get("/", async (req, res) => {
         return b.seatsAvailable.AC - a.seatsAvailable.AC;
       }
 
-      // Calculating the departure
+      // Calculating the departure time
       const aDepartureTimeWithDelay = new Date(
         0,
         0,
@@ -90,7 +90,7 @@ app.get("/", async (req, res) => {
       aDepartureTimeWithDelay.setMinutes(
         aDepartureTimeWithDelay.getMinutes() + a.delayedBy
       );
-
+      //calculates departure time with delay in minutes
       const bDepartureTimeWithDelay = new Date(
         0,
         0,
@@ -108,7 +108,7 @@ app.get("/", async (req, res) => {
     });
 
     res.json(trains_data);
-    console.log(trains_data);
+    console.log(trains_data); //for debugging the data
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: error.message });
