@@ -4,7 +4,6 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 
-
 const app = express();
 app.use(cors());
 const PORT = 3000;
@@ -58,6 +57,55 @@ app.get("/", async (req, res) => {
   try {
     const trains_data = await fetchTrains();
 
+    trains_data.sort((a, b) => {
+      // sorting in ascending order of sleeper class price
+      if (a.price.sleeper !== b.price.sleeper) {
+        return a.price.sleeper - b.price.sleeper;
+      }
+
+      // sorting in ascending order of AC class price
+      if (a.price.AC !== b.price.AC) {
+        return a.price.AC - b.price.AC;
+      }
+
+      // sorting descending order of sleeper class seat availability
+      if (a.seatsAvailable.sleeper !== b.seatsAvailable.sleeper) {
+        return b.seatsAvailable.sleeper - a.seatsAvailable.sleeper;
+      }
+
+      // sorting descending order of AC class seat availability
+      if (a.seatsAvailable.AC !== b.seatsAvailable.AC) {
+        return b.seatsAvailable.AC - a.seatsAvailable.AC;
+      }
+
+      // Calculating the departure
+      const aDepartureTimeWithDelay = new Date(
+        0,
+        0,
+        0,
+        a.departureTime.Hours,
+        a.departureTime.Minutes,
+        a.departureTime.Seconds
+      );
+      aDepartureTimeWithDelay.setMinutes(
+        aDepartureTimeWithDelay.getMinutes() + a.delayedBy
+      );
+
+      const bDepartureTimeWithDelay = new Date(
+        0,
+        0,
+        0,
+        b.departureTime.Hours,
+        b.departureTime.Minutes,
+        b.departureTime.Seconds
+      );
+      bDepartureTimeWithDelay.setMinutes(
+        bDepartureTimeWithDelay.getMinutes() + b.delayedBy
+      );
+
+      // sorting descending order of departure time (considering delays)
+      return bDepartureTimeWithDelay - aDepartureTimeWithDelay;
+    });
 
     res.json(trains_data);
     console.log(trains_data);
